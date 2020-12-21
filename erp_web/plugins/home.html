@@ -39,7 +39,7 @@
             <div class="col-md-3 col-sm-6 col-xs-12">
                 <div class="info-box">
                     <span class="info-box-icon bg-red"><i class="fa fa-shopping-cart"></i></span>
-                    <div class="info-box-content" style="cursor:pointer;" onclick="showThisDaySalary">
+                    <div class="info-box-content" style="cursor:pointer;"onclick="showThisDaySalary()">
                         <span class="info-box-text">今日销售数(件)</span>
                         <span id="todayNum" class="info-box-number"></span>
                         <a class="info-box-littlenumber">作日:</a>
@@ -99,7 +99,9 @@
                 </div>
             </section>
         </div>
+        <div id="thisDaySalary" class="thisDaySalary"></div>
     </div>
+
     <footer class="main-footer m0">
         <div class="pull-right hidden-xs">当前版本： V1.0</div>
         &copy; 2020-2099 KimERP - Powered By <a href="https://www.amazon.com/loyanyy" target="_blank">loyanyy</a>
@@ -111,13 +113,70 @@
 <script src="js/common/jsherp.js"></script>
 <script src="js/common/common.js"></script>
 <script src="js/common/i18n/jsherp_zh_CN.js"></script>
-<script src="js/jquery/jquery-1.12.4.min.js"></script>
-<script src="js/bootstrap/js/bootstrap.min.js"></script>
+<script src="js/layer/3.1/layer.js"></script>
+<script src="js/jquery/jquery-1.12.4.js"></script>
 <script>
     function showThisDaySalary(){
-
+        $.ajax({url:"/depotItem/todaySaleNum",success:function(res){
+            $('#thisDaySalary').empty()
+            let list=res.data;
+            for(var key in list){
+                if(list[key].length>0){
+                    var good=$("<div class='goodTitle'>"+list[key][0].remark+"</div>");
+                    $("#thisDaySalary").append(good);
+                    list[key].forEach(el=>{
+                        var child=$('<div class="goodChild">'+'<span class="goodChildTitle">'+el.materialType+'</span>'+'<span class="goodChildNumber">售出：'+el.operNumber+'</span>'+'</div>');
+                        good.append(child);
+                    })
+                }
+            }
+            layer.open({
+                title: '今日销售数',
+                type: 1,//0（信息框，默认）1（页面层）2（iframe层）3（加载层）4（tips层）
+                content: $('#thisDaySalary'),
+                area: '600px',
+                yes: function(){
+                    //点击确定的回调
+                    $('#thisDaySalary').css('display','none')
+                },
+                cancel: function(){
+                    //右上角关闭回调
+                    $('#thisDaySalary').css('display','none')
+                }
+            });
+        }});
     }
 </script>
+<style>
+    .thisDaySalary{
+        width: 600px;
+    }
+    .goodTitle{
+        font-size: 15px;
+        font-weight: 800;
+        margin: 5px 20px;
+        color: #0E2D5F;
+    }
+    .goodChild{
+        border-bottom:1px solid lightgray ;
+        padding: 5px 0px;
+    }
+    .goodChildTitle{
+        display: inline-block;
+        font-size: 14px;
+        font-weight: normal;
+        width: 70%;
+        margin: 0px 20px;
+        color: #000000;
+    }
+    .goodChildNumber{
+        display: inline-block;
+        margin: 0px 20px;
+        font-size: 14px;
+        font-weight: normal;
+        color: #000000;
+    }
+</style>
 <script>
     if ($('#switchSkin').length > 0) {
         $('#switchSkin i').addClass('jump5');

@@ -7,6 +7,7 @@ import com.jsh.erp.constants.ExceptionConstants;
 import com.jsh.erp.datasource.entities.*;
 import com.jsh.erp.datasource.vo.DepotItemStockWarningCount;
 import com.jsh.erp.exception.BusinessRunTimeException;
+import com.jsh.erp.service.depotHead.DepotHeadService;
 import com.jsh.erp.service.materialExtend.MaterialExtendService;
 import com.jsh.erp.service.depotItem.DepotItemService;
 import com.jsh.erp.service.material.MaterialService;
@@ -25,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.jsh.erp.utils.ResponseJsonUtil.returnJson;
+import static com.jsh.erp.utils.Tools.getNow3;
 
 /**
  * @author ji-sheng-hua 华夏erp
@@ -43,6 +45,8 @@ public class DepotItemController {
     @Resource
     private MaterialExtendService materialExtendService;
 
+    @Resource
+    private DepotHeadService depotHeadService;
     /**
      * 只根据商品id查询单据列表
      * @param mId
@@ -773,20 +777,22 @@ public class DepotItemController {
         String message = "成功";
         try {
             String now = Tools.getNow();
-            List<DepotItem> cwmt= new ArrayList<DepotItem>();
-            List<DepotItem> cwwjtz = new ArrayList<DepotItem>();
-            List<DepotItem> gzxxb = new ArrayList<DepotItem>();
-            List<DepotItem> hbxzwy = new ArrayList<DepotItem>();
-            List<DepotItem> sdqz = new ArrayList<DepotItem>();
-            List<DepotItem> ydrbxz1 = new ArrayList<DepotItem>();
-            List<DepotItem> ydrbx= new ArrayList<DepotItem>();
-            List<DepotItem> cwnd= new ArrayList<DepotItem>();
             List<Material> materials = depotItemService.materialName();
             for(int i=0;i<materials.size();i++){
                 String materialName = materials.get(i).getName();
                 List<DepotItem> materialSaleDetail= depotItemService.outDetailByName("出库", "零售", now, materialName);
-                map.put(materialName, materialSaleDetail);
+                //该商品所有类型数量
+                BigDecimal bigDecimal = depotItemService.outDetailNum("出库", "零售", now, materialName);
+                Map map1=new HashMap();
+                map1.put("materialNum",materialSaleDetail);
+                map1.put("total",bigDecimal);
+                map.put(materialName, map1);
             }
+            //今日销售数量
+            String today = Tools.getNow() + " 00:00:00";
+            BigDecimal todayNum = depotHeadService.getBuyAndSaleTodayNum("出库", "零售",
+                    0, today, getNow3()); //今日销售出库件数
+            map.put("todayTotal",todayNum);
             res.code = 200;
             res.data = map;
         } catch (Exception e) {

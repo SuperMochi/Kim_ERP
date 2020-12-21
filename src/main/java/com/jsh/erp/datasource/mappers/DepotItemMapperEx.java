@@ -82,6 +82,7 @@ public interface DepotItemMapperEx {
             @Param("type") String type,
             @Param("subType") String subType,
             @Param("MonthTime") String MonthTime);
+    List<Material> queryMaterialName();
 
     BigDecimal getStockCheckSum(
             @Param("depotId") Long depotId,

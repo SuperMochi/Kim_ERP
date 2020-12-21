@@ -26,10 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class DepotItemService {
@@ -311,6 +308,16 @@ public class DepotItemService {
         }
         return result;
     }
+    public List<Material> materialName(){
+        List<Material> result= new ArrayList<>();
+        try{
+            result = depotItemMapperEx.queryMaterialName();
+        }catch(Exception e){
+            JshException.readFail(logger, e);
+        }
+        return result;
+    }
+
 
     @Transactional(value = "transactionManager", rollbackFor = Exception.class)
     public void saveDetials(String rows, Long headerId, Long tenantId, HttpServletRequest request) throws Exception{
