@@ -781,22 +781,12 @@ public class DepotItemController {
             List<DepotItem> ydrbxz1 = new ArrayList<DepotItem>();
             List<DepotItem> ydrbx= new ArrayList<DepotItem>();
             List<DepotItem> cwnd= new ArrayList<DepotItem>();
-            cwmt = depotItemService.outDetailByName("出库", "零售", now, "宠物毛毯");
-            cwwjtz = depotItemService.outDetailByName("出库", "零售", now, "宠物玩具套餐");
-            gzxxb = depotItemService.outDetailByName("出库", "零售", now, "格子熊胸背");
-            hbxzwy = depotItemService.outDetailByName("出库", "零售", now, "滑板小子卫衣");
-            sdqz = depotItemService.outDetailByName("出库", "零售", now, "圣诞裙子");
-            ydrbxz1 = depotItemService.outDetailByName("出库", "零售", now, "云朵绒背心 Z1");
-            ydrbx = depotItemService.outDetailByName("出库", "零售", now, "云朵绒背心");
-            cwnd = depotItemService.outDetailByName("出库", "零售", now, "宠物尿垫");
-            map.put("cwmt", cwmt);
-            map.put("cwwjtz", cwwjtz);
-            map.put("gzxxb", gzxxb);
-            map.put("hbxzwy", hbxzwy);
-            map.put("sdqz", sdqz);
-            map.put("ydrbxz1", ydrbxz1);
-            map.put("ydrbx", ydrbx);
-            map.put("cwnd", cwnd);
+            List<Material> materials = depotItemService.materialName();
+            for(int i=0;i<materials.size();i++){
+                String materialName = materials.get(i).getName();
+                List<DepotItem> materialSaleDetail= depotItemService.outDetailByName("出库", "零售", now, materialName);
+                map.put(materialName, materialSaleDetail);
+            }
             res.code = 200;
             res.data = map;
         } catch (Exception e) {
